@@ -30,6 +30,4 @@ class QuestionsRepoitory {
     return;
   }
 
-
-
 }
