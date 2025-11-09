@@ -10,9 +10,17 @@ class QuestionPage extends StatefulWidget {
 }
 
 class _QuestionPageState extends State<QuestionPage> {
+  String selectedAnswer = '';
+  List<String> allAnswers = []; // для хранения перемешанных вариантов
+
+  @override
+  void initState() {
+    context.read<QuestionBloc>().add(QuestionLoad());
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    context.read<QuestionBloc>().add(QuestionLoad());
     return Scaffold(
       appBar: AppBar(
         title: const Row(
@@ -30,7 +38,7 @@ class _QuestionPageState extends State<QuestionPage> {
               value: 0.3,
               minHeight: 6,
               color: Colors.blue,
-              backgroundColor: Colors.grey[300],
+              backgroundColor: Colors.grey,
             ),
           ),
         ),
@@ -38,39 +46,47 @@ class _QuestionPageState extends State<QuestionPage> {
       body: BlocBuilder<QuestionBloc, QuestionState>(
         builder: (context, state) {
           if (state is QuestionLoading) {
-            return CircularProgressIndicator(
-              strokeWidth: 8,
-              valueColor: AlwaysStoppedAnimation<Color>(Colors.purple),
-              backgroundColor: Colors.purple.shade100,
+            return const Center(
+              child: CircularProgressIndicator(
+                strokeWidth: 8,
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.purple),
+              ),
             );
           } else if (state is QuestionError) {
-            return Center(
-              child: Column(children: [Text(state.message)]),
-            );
+            return Center(child: Text(state.message));
           } else if (state is QuestionLoaded) {
+            // Создаём список всех ответов и перемешиваем только один раз
+            if (allAnswers.isEmpty) {
+              allAnswers = [
+                ...state.trivia.results[0].incorrectAnswers,
+                state.trivia.results[0].correctAnswer,
+              ]..shuffle();
+            }
+
             return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   FractionallySizedBox(
-                    widthFactor: 0.7, // 70% ширины экрана
+                    widthFactor: 0.7,
                     child: Text(
                       state.trivia.results[0].question,
                       textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 31),
+                      style: const TextStyle(fontSize: 31),
                     ),
                   ),
                   Column(
                     mainAxisSize: MainAxisSize.min,
-                    children: state.trivia.results[0].incorrectAnswers.map((
-                      answer,
-                    ) {
+                    children: allAnswers.map((answer) {
                       return Padding(
                         padding: const EdgeInsets.symmetric(vertical: 8.0),
                         child: AnswerButton(
                           answer: answer,
-                          onpressed: () {
-                            // обработка нажатия
+                          selected: selectedAnswer == answer,
+                          onPressed: () {
+                            setState(() {
+                              selectedAnswer = answer;
+                            });
                           },
                         ),
                       );
@@ -80,7 +96,8 @@ class _QuestionPageState extends State<QuestionPage> {
               ),
             );
           }
-          return Text('Nothing');
+
+          return const Center(child: Text('Nothing'));
         },
       ),
     );

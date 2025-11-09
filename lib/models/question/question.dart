@@ -1,30 +1,19 @@
+import 'package:json_annotation/json_annotation.dart';
+part 'question.g.dart';
 
-class TriviaResponse {
-  final int responseCode;
-  final List<Question> results;
-
-  TriviaResponse({
-    required this.responseCode,
-    required this.results,
-  });
-
-  factory TriviaResponse.fromJson(Map<String, dynamic> json) {
-    return TriviaResponse(
-      responseCode: json['response_code'],
-      results: (json['results'] as List)
-          .map((e) => Question.fromJson(e))
-          .toList(),
-    );
-  }
-}
-
+@JsonSerializable()
 class Question {
   final String type;
   final String difficulty;
   final String category;
   final String question;
+ 
+  @JsonKey(name: 'correct_answer')
   final String correctAnswer;
+
+  @JsonKey(name: 'incorrect_answers')
   final List<String> incorrectAnswers;
+
 
   Question({
     required this.type,
@@ -35,15 +24,7 @@ class Question {
     required this.incorrectAnswers,
   });
 
-  factory Question.fromJson(Map<String, dynamic> json) {
-    return Question(
-      type: json['type'],
-      difficulty: json['difficulty'],
-      category: json['category'],
-      question: json['question'],
-      correctAnswer: json['correct_answer'],
-      incorrectAnswers:
-          List<String>.from(json['incorrect_answers'] as List),
-    );
-  }
+  factory Question.fromJson(Map<String, dynamic> json) => _$QuestionFromJson(json);
+
+  Map<String, dynamic> toJson() => _$QuestionToJson(this);
 }

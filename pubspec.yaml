@@ -14,12 +14,15 @@ dependencies:
     sdk: flutter
   http: ^1.5.0
   flutter_bloc: ^9.1.1
+  json_annotation: ^4.9.0
 
   cupertino_icons: ^1.0.8
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  json_serializable: ^6.11.1
+  build_runner: ^2.10.1
 
   flutter_lints: ^5.0.0
 
