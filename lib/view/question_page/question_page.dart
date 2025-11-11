@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:questioner/bloc/question_bloc.dart';
+import 'package:questioner/bloc/question_bloc/question_bloc.dart';
 import 'package:questioner/view/question_page/answer_button/answer_button.dart';
 
 class QuestionPage extends StatefulWidget {

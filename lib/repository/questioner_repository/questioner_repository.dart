@@ -4,6 +4,7 @@ class QuestionerRepository {
   TriviaResponse? _currentTest;
 
   int _currentIndex = 0;
+  List<bool> _correctList = [];
 
   // Сколько вопросов загружено
   int get totalQuestions => _currentTest?.results.length ?? 0;
@@ -22,6 +23,7 @@ class QuestionerRepository {
   // Устанавливаем тест (из API)
   void setTest(TriviaResponse test) {
     _currentTest = test;
+    _correctList = [];
     _currentIndex = 0;
   }
 
@@ -45,6 +47,14 @@ class QuestionerRepository {
 
   // Проверка ответа
   bool isCorrect(String answer) {
-    return currentQuestion?.correctAnswer == answer;
+    if (currentQuestion?.correctAnswer == answer) {
+        _correctList.add(true);
+        return true;
+    }
+    _correctList.add(false);
+    return false;
   }
+
+  
+
 }
