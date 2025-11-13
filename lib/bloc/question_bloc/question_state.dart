@@ -4,13 +4,17 @@ part of 'question_bloc.dart';
 
 class QuestionState {}
 class QuestionInitial extends QuestionState {}
-class QuestionLoading extends QuestionState {}
-class QuestionLoaded extends QuestionState {
-  QuestionLoaded({
-    required this.trivia
+class QuestionPeek extends QuestionState {
+  final Question question;
+  QuestionPeek({
+    required this.question
   });
-  final TriviaResponse trivia;
 }
+
+
+
+class QuestionsLoaded extends QuestionState {} 
+
 class QuestionError extends QuestionState {
   final String message;
   QuestionError({
