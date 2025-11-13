@@ -10,13 +10,15 @@ class QuestionPage extends StatefulWidget {
 }
 
 class _QuestionPageState extends State<QuestionPage> {
+  double progress = 0.0;
   String selectedAnswer = '';
   List<String> allAnswers = []; // для хранения перемешанных вариантов
 
   @override
   void initState() {
-    context.read<QuestionBloc>().add(QuestionLoad());
     super.initState();
+    final bloc = context.read<QuestionBloc>();
+    bloc.add(QuestionLoad());
   }
 
   @override
@@ -35,7 +37,7 @@ class _QuestionPageState extends State<QuestionPage> {
           child: FractionallySizedBox(
             widthFactor: 0.6,
             child: LinearProgressIndicator(
-              value: 0.3,
+              value: progress,
               minHeight: 6,
               color: Colors.blue,
               backgroundColor: Colors.grey,
@@ -45,21 +47,22 @@ class _QuestionPageState extends State<QuestionPage> {
       ),
       body: BlocBuilder<QuestionBloc, QuestionState>(
         builder: (context, state) {
-          if (state is QuestionLoading) {
+          if (state is QuestionLoading || state is QuestionsLoading) {
             return const Center(
               child: CircularProgressIndicator(
                 strokeWidth: 8,
                 valueColor: AlwaysStoppedAnimation<Color>(Colors.purple),
               ),
             );
-          } else if (state is QuestionError) {
-            return Center(child: Text(state.message));
-          } else if (state is QuestionLoaded) {
-            // Создаём список всех ответов и перемешиваем только один раз
+          } else if (state is QuestionError || state is QuestionsError) {
+            return Center(child: Text(state.toString()));
+          } else if (state is QuestionPeek) {
+            progress = state.progress;
+
             if (allAnswers.isEmpty) {
               allAnswers = [
-                ...state.trivia.results[0].incorrectAnswers,
-                state.trivia.results[0].correctAnswer,
+                state.question.correctAnswer,
+                ...state.question.incorrectAnswers,
               ]..shuffle();
             }
 
@@ -70,7 +73,7 @@ class _QuestionPageState extends State<QuestionPage> {
                   FractionallySizedBox(
                     widthFactor: 0.7,
                     child: Text(
-                      state.trivia.results[0].question,
+                      state.question.question,
                       textAlign: TextAlign.center,
                       style: const TextStyle(fontSize: 31),
                     ),
@@ -86,6 +89,7 @@ class _QuestionPageState extends State<QuestionPage> {
                           onPressed: () {
                             setState(() {
                               selectedAnswer = answer;
+                              context.read<QuestionBloc>().add(NextQuestion());
                             });
                           },
                         ),
@@ -95,9 +99,9 @@ class _QuestionPageState extends State<QuestionPage> {
                 ],
               ),
             );
+          } else {
+            return const SizedBox.shrink();
           }
-
-          return const Center(child: Text('Nothing'));
         },
       ),
     );

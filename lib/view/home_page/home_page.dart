@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:questioner/bloc/question_bloc/question_bloc.dart';
 
-
-
+import '../view.dart';
 
 class HomePage extends StatelessWidget {
+  const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -16,11 +18,22 @@ class HomePage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            const Text('Start a tet?'),
+            const Text('Start a test?'),
             ElevatedButton(
-              onPressed: () {}, 
-              child: Text('')
-            )
+              onPressed: () {
+                context.read<QuestionBloc>().add(QuestionsLoad());
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => BlocProvider.value(
+                      value: context.read<QuestionBloc>(),
+                      child: const QuestionPage(),
+                    ),
+                  ),
+                );
+              },
+              child: Text('Start'),
+            ),
           ],
         ),
       ),
